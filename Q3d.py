@@ -166,7 +166,7 @@ df4 = df3.copy()
 df4['group'] = group
 df4 = df4.groupby('group')
 
-print('plotting profiles of five groups')
+print('plotting profiles of five groups (no PCA)')
 fig5 = plt.figure(figsize=(30, 20))
 plt.title('profiles of five groups')
 for i in range(5):
@@ -235,10 +235,17 @@ if hasattr(spectral, 'labels_'):
 else:
 	group = spectral.predict(X)
 
-fig7 = plt.figure(figsize=(12, 10))
-ax = Axes3D(fig7, rect=[0, 0, .95, 1], elev=48, azim=134)
-ax.scatter(X[:, 0], X[:, 1], X[:, 2], c=group, cmap=plt.cm.spectral)
+df7 = pd.DataFrame(X,columns=['PC1','PC2','PC3'])
+df7['group']=group
+df7 = df7.groupby('group')
 
+fig7 = plt.figure(figsize=(12, 10))
+ax = Axes3D(fig7, rect=[0, 0, .95, 1], elev=20, azim=190)
+colors = ['violet', 'red', 'green', 'orange', 'blue']
+for i in range(5):
+	df_temp = df7.get_group(i)
+	ax.scatter(df_temp['PC1'].values, df_temp['PC2'].values, df_temp['PC3'].values, c=colors[i], label=i)
+ax.legend()
 ax.w_xaxis.set_ticklabels([])
 ax.w_yaxis.set_ticklabels([])
 ax.w_zaxis.set_ticklabels([])
@@ -258,8 +265,8 @@ for i in range(5):
 	df_temp = df4.get_group(i)
 	df_temp = df_temp.drop('group', 1)
 	df_temp = df_temp.sum()
-	df_temp.plot.bar()
+	df_temp.plot.bar(color=colors[i], label = i)
+	plt.legend()
 
 plt.savefig('cocktail_five_groups_PCA_SpectralClustering.png')
 plt.show()
-
